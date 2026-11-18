@@ -1,0 +1,52 @@
+@model BookDetailsViewModel
+@{
+    ViewData["Title"] = Model.Book.Title;
+}
+<a asp-action="Index" class="back">&larr; Back to the collection</a>
+<section class="book-details">
+    <div class="gallery" aria-label="Book images">
+        @foreach (var image in Model.Book.Images.OrderBy(image => image.Id))
+        {
+            <a href="@image.FilePath" target="_blank" rel="noopener"><img src="@image.FilePath" alt="Image of @Model.Book.Title" /></a>
+        }
+    </div>
+    <div class="description">
+        <p class="eyebrow">@Model.Book.Genre</p>
+        <h1>@Model.Book.Title</h1>
+        <p class="byline">by @Model.Book.Author</p>
+        <p class="price">@Model.Book.Price.ToString("0.00", CultureInfo.InvariantCulture) <span>UAH</span></p>
+        <p class="muted">@Model.Book.Description</p>
+        <div class="upload-panel">
+            <h2>Add book photos</h2>
+            <p class="muted small">Select up to 6 JPG, PNG or WebP images, up to 2 MB each.</p>
+            <form asp-action="UploadImages" asp-route-id="@Model.Book.Id" method="post" enctype="multipart/form-data">
+                <label for="images">Images</label>
+                <input id="images" name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple required />
+                <button type="submit">Upload images</button>
+            </form>
+        </div>
+    </div>
+</section>
+<section class="comments">
+    <div><p class="eyebrow">READER NOTES</p><h2>Join the conversation.</h2><p class="muted">@Model.Book.Comments.Count comment(s)</p></div>
+    <form asp-action="AddComment" asp-route-id="@Model.Book.Id" method="post" class="comment-form">
+        <div asp-validation-summary="ModelOnly" class="error"></div>
+        <label asp-for="Comment.Name">Your name</label>
+        <input asp-for="Comment.Name" maxlength="80" required placeholder="Name" />
+        <span asp-validation-for="Comment.Name" class="error"></span>
+        <label asp-for="Comment.Text">Your comment</label>
+        <textarea asp-for="Comment.Text" rows="5" maxlength="2000" required placeholder="What did you think of this book?"></textarea>
+        <span asp-validation-for="Comment.Text" class="error"></span>
+        <button type="submit">Post comment &rarr;</button>
+    </form>
+    <div class="comment-list">
+        @if (Model.Book.Comments.Count == 0)
+        {
+            <p class="muted">No comments yet. Share the first one.</p>
+        }
+        @foreach (var comment in Model.Book.Comments.OrderByDescending(comment => comment.CreatedAt))
+        {
+            <article class="comment"><div><strong>@comment.Name</strong><time datetime="@comment.CreatedAt.ToString("O")">@comment.CreatedAt.ToString("dd MMM yyyy, HH:mm", CultureInfo.InvariantCulture) UTC</time></div><p>@comment.Text</p></article>
+        }
+    </div>
+</section>
