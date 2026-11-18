@@ -1,0 +1,19 @@
+@model List<Book>
+@{
+    ViewData["Title"] = "The collection";
+}
+<section class="intro"><p class="eyebrow">THE COLLECTION / @Model.Count BOOKS</p><h1>Find your next<br /><em>good read.</em></h1><p class="muted">Familiar classics, new adventures and stories worth sharing.</p></section>
+<section class="catalog" aria-label="Book catalog">
+    @foreach (var book in Model)
+    {
+        <article class="book-card">
+            <a asp-action="Details" asp-route-id="@book.Id" class="cover"><img src="@book.Images.OrderBy(image => image.Id).FirstOrDefault()?.FilePath" alt="Cover of @book.Title" loading="lazy" /></a>
+            <div class="book-info">
+                <p class="genre">@book.Genre</p>
+                <h2><a asp-action="Details" asp-route-id="@book.Id">@book.Title</a></h2>
+                <p class="author">@book.Author</p>
+                <div class="book-bottom"><strong>@book.Price.ToString("0.00", CultureInfo.InvariantCulture) UAH</strong><a asp-action="Details" asp-route-id="@book.Id" aria-label="View @book.Title">View book &rarr;</a></div>
+            </div>
+        </article>
+    }
+</section>
